@@ -43,13 +43,10 @@ class Game {
     let war = false;
     
     // loop
-    while (humanDeck.length > 0 || aiDeck.length > 0 || war) {
+    while ((humanDeck.length > 0 && aiDeck.length > 0) || war) {
       // draw card
       cards.human = humanDeck.shift();
       cards.ai = aiDeck.shift();
-
-      // if deck runs out during war
-      
 
       // if war pot is collected
       if (war) {
@@ -59,13 +56,11 @@ class Game {
           cards.ai = humanDeck.shift();
         }
         cards.pot.push(cards.human, cards.ai);
-        if (cards.pot.length > 3 && cards.pot.length - 2 % 6 !== 0) continue;
+        if (cards.pot.length === 2 || (cards.pot.length - 2) % 6 !== 0) continue;
       }
-
+      
       // add to pot
       cards.pot.push(cards.human, cards.ai);
-
-      console.log(humanDeck)
 
       // evaluate cards
       if (cards.human.strength > cards.ai.strength) {
@@ -74,17 +69,17 @@ class Game {
       } else if (cards.human.strength < cards.ai.strength) {
         war = false;
         aiDeck.push(...cards.pot);
-      } else {
+      } else if (cards.human.strength === cards.ai.strength) {
         war = true
         continue;
+      } else {
+        throw new Error(`Invalid cards\nhuman - ${cards.human}\nai - ${cards.ai}\npot - ${cards.pot}`)
       }
       // reset
       cards.human = null;
       cards.ai = null;
       cards.pot = [];
     }
-
-    //console.log(humanDeck);
   }
 
   record(turn) {
