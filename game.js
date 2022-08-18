@@ -41,26 +41,23 @@ class Game {
     const aiDeck = shuffledDeck.slice(26, 52);
     const cards = {human: null, ai: null, pot: []};
     let war = false;
-    
+
     // loop
     while ((humanDeck.length > 0 && aiDeck.length > 0) || war) {
       // draw card
       cards.human = humanDeck.shift();
       cards.ai = aiDeck.shift();
 
-      // if war pot is collected
-      if (war) {
-        if (!cards.human) {
-          cards.human = aiDeck.shift();
-        } else if (!cards.ai) {
-          cards.ai = humanDeck.shift();
-        }
-        cards.pot.push(cards.human, cards.ai);
-        if (cards.pot.length === 2 || (cards.pot.length - 2) % 6 !== 0) continue;
+      // if cards run out during war
+      if (!cards.human) {
+        cards.human = aiDeck.shift();
+      } else if (!cards.ai) {
+        cards.ai = humanDeck.shift();
       }
-      
-      // add to pot
+
       cards.pot.push(cards.human, cards.ai);
+
+      if (war && (cards.pot.length === 2 || (cards.pot.length - 2) % 6 !== 0)) continue;
 
       // evaluate cards
       if (cards.human.strength > cards.ai.strength) {
@@ -69,17 +66,16 @@ class Game {
       } else if (cards.human.strength < cards.ai.strength) {
         war = false;
         aiDeck.push(...cards.pot);
-      } else if (cards.human.strength === cards.ai.strength) {
+      } else {
         war = true
         continue;
-      } else {
-        throw new Error(`Invalid cards\nhuman - ${cards.human}\nai - ${cards.ai}\npot - ${cards.pot}`)
       }
       // reset
       cards.human = null;
       cards.ai = null;
       cards.pot = [];
     }
+    console.log(`you ${humanDeck? 'win': 'lose'}`)
   }
 
   record(turn) {
