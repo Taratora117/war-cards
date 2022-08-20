@@ -18,15 +18,19 @@ const VALUES = {
 class Game {
   #history = [];
 
-  #shuffle() {
+  #newDeck() {
     const deck = [];
     SUITS.forEach((suit) => {
       Object.keys(VALUES).forEach((value) => {
         deck.push({value: value, suit: suit, strength: VALUES[value]});
       });
     });
+    return [...deck];
+  }
+
+  #shuffle(deck) {
     for (let i = 0; i < deck.length; i++) {
-      let j = Math.floor(Math.random() * i);
+      let j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
     return [...deck];
@@ -36,7 +40,7 @@ class Game {
 
   play() {
     //init
-    const shuffledDeck = this.#shuffle();
+    const shuffledDeck = this.#shuffle(this.#newDeck());
     const humanDeck = shuffledDeck.slice(0, 26);
     const aiDeck = shuffledDeck.slice(26, 52);
     const cards = {human: null, ai: null, pot: []};
@@ -62,10 +66,10 @@ class Game {
       // evaluate cards
       if (cards.human.strength > cards.ai.strength) {
         war = false;
-        humanDeck.push(...cards.pot);
+        humanDeck.push(...this.#shuffle(cards.pot));
       } else if (cards.human.strength < cards.ai.strength) {
         war = false;
-        aiDeck.push(...cards.pot);
+        aiDeck.push(...this.#shuffle(cards.pot));
       } else {
         war = true
         continue;
@@ -75,7 +79,7 @@ class Game {
       cards.ai = null;
       cards.pot = [];
     }
-    console.log(`you ${humanDeck? 'win': 'lose'}`)
+    return `you ${humanDeck.length? 'win': 'lose'}`; // return this.#history;
   }
 
   record(turn) {
